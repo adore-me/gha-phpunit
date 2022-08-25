@@ -25,6 +25,11 @@ runs:
       env:
         INPUT_PHP_IMAGE_TAG: ${{ inputs.php-image-tag }}
         INPUT_REPORT_PATH: ${{ inputs.report-path }}
+    - name: 'Stop MySql'
+      shell: bash
+      run: |
+        docker stop mysql -t 0
+        docker rm mysql
     - name: 'Publish PHPUnit Results'
       if: always()
       uses: EnricoMi/publish-unit-test-result-action@v2.0.0
