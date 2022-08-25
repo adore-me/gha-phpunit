@@ -1,7 +1,7 @@
 # phpunit-action
 
 ## Description
-Run composer install with custom PHP image.
+Run phpunit with custom PHP image.
 
 ## Inputs
 | Key                | Default                             | Description                                                                         |
