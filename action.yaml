@@ -1,0 +1,41 @@
+name: 'AdoreMe Tech PHPUnit Action'
+description: 'Run PHPUnit tests'
+inputs:
+  php-image-tag:
+    description: 'The PHP image to use'
+    required: false
+    default: ''
+  report-path:
+    description: 'PHPUnit peport file path'
+    required: true
+    default: './build/reports/phpunit-junit.xml'
+  enable-mysql:
+    description: 'Enable MySQL'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Deploy MySql'
+      if: ${{ inputs.enable-mysql == 'true' }}
+      uses: adore-me/mysql-action@master
+    - name: 'Run PHPUnit'
+      run: $GITHUB_ACTION_PATH/phpunit.sh
+      shell: bash
+      env:
+        INPUT_PHP_IMAGE_TAG: ${{ inputs.php-image-tag }}
+        INPUT_REPORT_PATH: ${{ inputs.report-path }}
+    - name: 'Stop MySql' # we only care about stopping it on local runs
+      if: ${{ env.ACT && inputs.enable-mysql == 'true' }}
+      shell: bash
+      run: |
+        docker stop mysql -t 0
+        docker rm mysql
+    - name: 'Publish PHPUnit Results'
+      if: always()
+      uses: EnricoMi/publish-unit-test-result-action@v2.0.0
+      with:
+        check_name: 'PHPUnit'
+        comment_title: 'PHPUnit Results'
+        report_individual_runs: true
+        junit_files: ${{ inputs.report-path }}
