@@ -43,7 +43,7 @@ if [ "$INPUT_ENABLE_REDIS" == "true" ]; then
     exit 1
   fi
 
-  addHost+=" --add-host=$redisHost:$REDIS_HOST"
+  addHost="$addHost --add-host=$redisHost:$REDIS_HOST"
   echo -e "${BL}Info:${NC} Redis host provided: $REDIS_HOST"
 fi
 
