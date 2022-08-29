@@ -24,17 +24,25 @@ fi
 IMAGE="quay.io/adoreme/nginx-fpm-alpine:$IMAGE_TAG"
 
 addHost=""
-if [ -z "$DB_HOST" ]; then
-  if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
+if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
+  if [ -z "$DB_HOST" ]; then
     echo "::error:: No DB_HOST provided, but MySql is enabled. Please checks logs above for errors."
     exit 1
-  else
-    echo -e "${BL}Info:${NC} No DB_HOST provided, but MySql is disabled. Skipping MySQL host setup."
   fi
-else
+
   addHost="--add-host=mysql.local:$DB_HOST"
   echo -e "${BL}Info:${NC} MySql host provided: $DB_HOST"
   echo -e "${BL}Info:${NC} Running PHP container with \`$addHost\`"
+
+  echo -e "${BL}Info:${NC} Running migrations with image: ${GR}nginx-fpm-alpine:$IMAGE${NC}"
+  docker run \
+    --platform linux/amd64 \
+    --network=bridge "$addHost" \
+    --add-host=mysql.gha:"$DB_HOST" \
+    -e DB_HOST=mysql.gha -e DB_HOST_WRITE=mysql.gha -e DB_HOST_READ=mysql.gha -e DB_DATABASE=adoreme -e DB_USERNAME=adoreme -e DB_PASSWORD=secret \
+    -v "$PWD":/var/www \
+    "$IMAGE" \
+    "/bin/bash" "-c" "php artisan migrate -n --force"
 fi
 
 echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}nginx-fpm-alpine:$IMAGE${NC}"
