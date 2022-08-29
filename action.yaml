@@ -13,6 +13,10 @@ inputs:
     description: 'Enable MySQL'
     required: false
     default: 'false'
+  enable-redis:
+    description: 'Enable Redis'
+    required: false
+    default: 'false'
 runs:
   using: 'composite'
   steps:
@@ -20,20 +24,32 @@ runs:
       id: start-mysql
       if: ${{ inputs.enable-mysql == 'true' }}
       uses: adore-me/gha-mysql@v0.0.7
+    - name: 'Start Redis'
+      id: start-redis
+      if: ${{ inputs.enable-redis == 'true' }}
+      uses: adore-me/gha-redis@v0.0.1
     - name: 'Run PHPUnit'
       run: $GITHUB_ACTION_PATH/phpunit.sh
       shell: bash
       env:
-        DB_HOST: ${{ steps.start-mysql.outputs.container-ip }}
+        MYSQL_HOST: ${{ steps.start-mysql.outputs.container-ip }}
+        REDIS_HOST: ${{ steps.start-redis.outputs.container-ip }}
         INPUT_PHP_IMAGE_TAG: ${{ inputs.php-image-tag }}
         INPUT_REPORT_PATH: ${{ inputs.report-path }}
         INPUT_ENABLE_MYSQL: ${{ inputs.enable-mysql }}
+        INPUT_ENABLE_REDIS: ${{ inputs.enable-redis }}
     - name: 'Stop MySql'
       if: ${{ inputs.enable-mysql == 'true' }}
       shell: bash
       run: |
         docker stop mysql -t 0
         docker rm mysql
+    - name: 'Stop Redis'
+      if: ${{ inputs.enable-redis == 'true' }}
+      shell: bash
+      run: |
+        docker stop redis -t 0
+        docker rm redis
     - name: 'Publish PHPUnit Results'
       if: always()
       uses: EnricoMi/publish-unit-test-result-action@v2.0.0
