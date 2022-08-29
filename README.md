@@ -1,4 +1,4 @@
-# phpunit-action
+# gha-phpunit
 
 ## Description
 Run phpunit with custom PHP image.
