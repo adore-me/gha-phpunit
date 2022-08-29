@@ -13,6 +13,15 @@ Run phpunit with custom PHP image.
 ## Outputs
 None.
 
+⚠ If **MySql** is enabled the host in the PHP container will be set as `mysql.gha`, so you will need to set your `.env`'s `DB_HOST(_READ/WRITE)` to `mysql.gha`.
+Ex:
+```
+DB_HOST=mysql.gha
+DB_HOST_READ=mysql.gha
+DB_HOST_WRITE=mysql.gha
+```
+
+
 ### Example of step configuration and usage:
 ```yaml
 steps:
