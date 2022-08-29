@@ -19,7 +19,7 @@ runs:
     - name: 'Start MySql'
       id: start-mysql
       if: ${{ inputs.enable-mysql == 'true' }}
-      uses: ./.github/actions/mysql-action
+      uses: adore-me/gha-mysql@v0.0.7
     - name: 'Run PHPUnit'
       run: $GITHUB_ACTION_PATH/phpunit.sh
       shell: bash
