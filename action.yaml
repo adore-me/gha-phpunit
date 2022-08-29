@@ -13,7 +13,6 @@ inputs:
     description: 'Enable MySQL'
     required: false
     default: 'false'
-
 runs:
   using: 'composite'
   steps:
