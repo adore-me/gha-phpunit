@@ -7,6 +7,9 @@ YL='\033[0;33m'
 BL='\033[0;34m'
 NC='\033[0m'
 
+mysqlHost="mysql.gha"
+redisHost="redis.gha"
+
 IMAGE_TAG=""
 if [ -n "$PHP_IMAGE_TAG" ]; then
   IMAGE_TAG="$PHP_IMAGE_TAG"
@@ -30,19 +33,8 @@ if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
     exit 1
   fi
 
-  addHost="--add-host=mysql.gha:$MYSQL_HOST"
+  addHost="--add-host=$mysqlHost:$MYSQL_HOST"
   echo -e "${BL}Info:${NC} MySql host provided: $MYSQL_HOST"
-  echo -e "${BL}Info:${NC} Running PHP container with \`$addHost\`"
-
-  echo -e "${BL}Info:${NC} Running migrations with image: ${GR}nginx-fpm-alpine:$IMAGE${NC}"
-  docker run \
-    --platform linux/amd64 \
-    --network=bridge "$addHost" \
-    --add-host=mysql.gha:"$MYSQL_HOST" \
-    -e MYSQL_HOST=mysql.gha -e DB_HOST_WRITE=mysql.gha -e DB_HOST_READ=mysql.gha -e DB_DATABASE=adoreme -e DB_USERNAME=adoreme -e DB_PASSWORD=secret \
-    -v "$PWD":/var/www \
-    "$IMAGE" \
-    "/bin/bash" "-c" "php artisan migrate -n --force"
 fi
 
 if [ "$INPUT_ENABLE_REDIS" == "true" ]; then
@@ -51,11 +43,23 @@ if [ "$INPUT_ENABLE_REDIS" == "true" ]; then
     exit 1
   fi
 
-  addHost+=" --add-host=redis.gha:$REDIS_HOST"
+  addHost+=" --add-host=$redisHost:$REDIS_HOST"
   echo -e "${BL}Info:${NC} Redis host provided: $REDIS_HOST"
-  echo -e "${BL}Info:${NC} Running PHP container with \`$addHost\`"
 fi
 
+if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
+  echo -e "${BL}Info:${NC} Running migrations with image: ${GR}nginx-fpm-alpine:$IMAGE${NC}"
+  docker run \
+    --platform linux/amd64 \
+    --network=bridge "$addHost" \
+    --add-host=$mysqlHost:"$MYSQL_HOST" \
+    -e MYSQL_HOST=$mysqlHost -e DB_HOST_WRITE=$mysqlHost -e DB_HOST_READ=$mysqlHost -e DB_DATABASE=adoreme -e DB_USERNAME=adoreme -e DB_PASSWORD=secret \
+    -v "$PWD":/var/www \
+    "$IMAGE" \
+    "/bin/bash" "-c" "php artisan migrate -n --force"
+fi
+
+echo -e "${BL}Info:${NC} Running PHP container with ${GR}\`$addHost\`${NC}"
 echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}nginx-fpm-alpine:$IMAGE${NC}"
 docker run \
   --platform linux/amd64 \
