@@ -1,22 +1,37 @@
 name: 'AdoreMe Tech PHPUnit Action'
-description: 'Run PHPUnit tests'
+description: 'Run PHPUnit tests (and optionally coverage)'
 inputs:
-  php-image-tag:
+  php-image:
     description: 'The PHP image to use'
-    required: false
-    default: ''
+    required: true
   report-path:
-    description: 'PHPUnit peport file path'
+    description: 'PHPUnit report file path'
     required: true
     default: './build/reports/phpunit-junit.xml'
   enable-mysql:
     description: 'Enable MySQL'
-    required: false
+    required: true
     default: 'false'
   enable-redis:
     description: 'Enable Redis'
-    required: false
+    required: true
     default: 'false'
+  enable-workers:
+    description: 'Enable Workers'
+    required: true
+    default: 'false'
+  workers-conf-path:
+    description: 'Workers configuration file path'
+    required: true
+    default: 'ci/worker-confs/supervisor_dev_test_workers.conf'
+  with-coverage:
+    description: 'Run coverage'
+    required: true
+    default: 'true'
+  coverage-path:
+    description: 'Coverage file path'
+    required: true
+    default: './build/reports/clover-coverage.xml'
 runs:
   using: 'composite'
   steps:
@@ -32,12 +47,16 @@ runs:
       run: $GITHUB_ACTION_PATH/phpunit.sh
       shell: bash
       env:
-        MYSQL_HOST: ${{ steps.start-mysql.outputs.container-ip }}
-        REDIS_HOST: ${{ steps.start-redis.outputs.container-ip }}
-        INPUT_PHP_IMAGE_TAG: ${{ inputs.php-image-tag }}
+        INPUT_PHP_IMAGE: ${{ inputs.php-image }}
+        MYSQL_CONTAINER_IP: ${{ steps.start-mysql.outputs.container-ip }}
+        REDIS_CONTAINER_IP: ${{ steps.start-redis.outputs.container-ip }}
         INPUT_REPORT_PATH: ${{ inputs.report-path }}
         INPUT_ENABLE_MYSQL: ${{ inputs.enable-mysql }}
         INPUT_ENABLE_REDIS: ${{ inputs.enable-redis }}
+        INPUT_ENABLE_WORKERS: ${{ inputs.enable-workers }}
+        INPUT_WORKERS_CONF_PATH: ${{ inputs.workers-conf-path }}
+        INPUT_WITH_COVERAGE: ${{ inputs.with-coverage }}
+        INPUT_COVERAGE_PATH: ${{ inputs.coverage-path }}
     - name: 'Stop MySql'
       if: ${{ inputs.enable-mysql == 'true' }}
       shell: bash
@@ -58,3 +77,9 @@ runs:
         comment_title: 'PHPUnit Results'
         report_individual_runs: true
         junit_files: ${{ inputs.report-path }}
+    - name: 'Publish Coverage'
+      if: ${{ inputs.run-coverage == 'true' }}
+      uses: lucassabreu/comment-coverage-clover@main
+      with:
+        file: ${{ inputs.coverage-path }}
+        dir-prefix: '/var/www'

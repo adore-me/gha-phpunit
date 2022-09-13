@@ -7,63 +7,71 @@ YL='\033[0;33m'
 BL='\033[0;34m'
 NC='\033[0m'
 
+# Constants
 mysqlHost="mysql.gha"
 redisHost="redis.gha"
 
-IMAGE_TAG=""
-if [ -n "$PHP_IMAGE_TAG" ]; then
-  IMAGE_TAG="$PHP_IMAGE_TAG"
-fi
-
-if [ -n "$INPUT_PHP_IMAGE_TAG" ]; then
-  IMAGE_TAG="$INPUT_PHP_IMAGE_TAG"
-fi
-
-if [ -z "$IMAGE_TAG" ]; then
-  echo "::error::No PHP image tag provided"
+if [ -z "$INPUT_PHP_IMAGE" ]; then
+  echo "::error::No PHP image provided"
   exit 1
 fi
 
-IMAGE="quay.io/adoreme/nginx-fpm-alpine:$IMAGE_TAG"
+phpUnitCmd="./vendor/bin/phpunit --configuration=./phpunit.xml --log-junit=$INPUT_REPORT_PATH"
+if [ "$INPUT_WITH_COVERAGE" == "true" ]; then
+  INPUT_PHP_IMAGE="${INPUT_PHP_IMAGE}-dev"
+  phpUnitCmd="php -d xdebug.mode=coverage ./vendor/bin/phpunit --configuration=./phpunit.xml --log-junit=$INPUT_REPORT_PATH --whitelist app/ --coverage-clover '$INPUT_COVERAGE_PATH'"
+fi
 
-addHost=""
+addHostMysql="--add-host=$mysqlHost:127.0.0.1"
 if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
-  if [ -z "$MYSQL_HOST" ]; then
-    echo "::error:: No MYSQL_HOST provided, but MySql is enabled. Please checks logs above for errors."
+  if [ -z "$MYSQL_CONTAINER_IP" ]; then
+    echo "::error:: No MYSQL_CONTAINER_IP provided, but MySql is enabled. Please checks logs above for errors."
     exit 1
   fi
 
-  addHost="--add-host=$mysqlHost:$MYSQL_HOST"
-  echo -e "${BL}Info:${NC} MySql host provided: $MYSQL_HOST"
+  addHostMysql="--add-host=$mysqlHost:$MYSQL_CONTAINER_IP"
+  echo -e "${BL}Info:${NC} MySql host provided: $MYSQL_CONTAINER_IP"
 fi
 
+addHostRedis="--add-host=$redisHost:127.0.0.1"
 if [ "$INPUT_ENABLE_REDIS" == "true" ]; then
-  if [ -z "$REDIS_HOST" ]; then
-    echo "::error:: No REDIS_HOST provided, but Redis is enabled. Please checks logs above for errors."
+  if [ -z "$REDIS_CONTAINER_IP" ]; then
+    echo "::error:: No REDIS_CONTAINER_IP provided, but Redis is enabled. Please checks logs above for errors."
     exit 1
   fi
 
-  addHost="$addHost --add-host=$redisHost:$REDIS_HOST"
-  echo -e "${BL}Info:${NC} Redis host provided: $REDIS_HOST"
+  addHostRedis="--add-host=$redisHost:$REDIS_CONTAINER_IP"
+  echo -e "${BL}Info:${NC} Redis host provided: $REDIS_CONTAINER_IP"
 fi
+
+echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}$INPUT_PHP_IMAGE${NC} and hosts $GR\`$addHostMysql $addHostRedis\`${NC}"
+docker run \
+  -d \
+  --platform linux/amd64 \
+  --name nginx-fpm-alpine \
+  --network=bridge \
+  "$addHostMysql" \
+  "$addHostRedis" \
+  --env-file ./.env.testing \
+  -v "$PWD":/var/www \
+  "${INPUT_PHP_IMAGE}"
 
 if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
-  echo -e "${BL}Info:${NC} Running migrations with image: ${GR}nginx-fpm-alpine:$IMAGE${NC}"
-  docker run \
-    --platform linux/amd64 \
-    --network=bridge "$addHost" \
-    --add-host=$mysqlHost:"$MYSQL_HOST" \
-    -e MYSQL_HOST=$mysqlHost -e DB_HOST_WRITE=$mysqlHost -e DB_HOST_READ=$mysqlHost -e DB_DATABASE=adoreme -e DB_USERNAME=adoreme -e DB_PASSWORD=secret \
-    -v "$PWD":/var/www \
-    "$IMAGE" \
-    "/bin/bash" "-c" "php artisan migrate -n --force"
+  echo -e "${BL}Info:${NC} Bootstrap fresh DB"
+  docker exec nginx-fpm-alpine bash -c "php artisan migrate:fresh -n --force && php artisan db:seed --force"
 fi
 
-echo -e "${BL}Info:${NC} Running PHP container with ${GR}\`$addHost\`${NC}"
-echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}nginx-fpm-alpine:$IMAGE${NC}"
-docker run \
-  --platform linux/amd64 \
-  --network=bridge "$addHost" \
-  -v "$PWD":/var/www \
-  "$IMAGE" \
-  "/bin/bash" "-c" "./vendor/bin/phpunit --configuration=./phpunit.xml --log-junit=${INPUT_REPORT_PATH}"
+if [ "$INPUT_ENABLE_WORKERS" == "true" ]; then
+  echo -e "${BL}Info:${NC} Starting workers"
+  docker exec nginx-fpm-alpine bash -c "ln -sf /var/www/$INPUT_WORKERS_CONF_PATH /etc/supervisor.d/conf.d/worker.conf && supervisorctl reread && supervisorctl update && supervisorctl restart all"
+fi
+
+docker exec nginx-fpm-alpine bash -c "$phpUnitCmd"
+UNIT_TEST_EXIT_CODE=$?
+
+docker stop nginx-fpm-alpine
+
+if [ "$UNIT_TEST_EXIT_CODE" != "0" ]; then
+  echo "::error::PHPUnit failed with exit code: $UNIT_TEST_EXIT_CODE"
+  exit $UNIT_TEST_EXIT_CODE
+fi
