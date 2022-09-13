@@ -1,36 +1,72 @@
 # gha-phpunit
 
 ## Description
+
 Run phpunit with custom PHP image.
 
 ## Inputs
-| Key                | Default                             | Description                                                                         |
-|--------------------|-------------------------------------|-------------------------------------------------------------------------------------|
-| **php-image-tag**  | `''`                                | PHP image tag to use. Takes precedence over the PHP_IMAGE_TAG environment variable. |
-| **report-path**    | `./build/reports/phpunit-junit.xml` | Report file path.                                                                   |
-| **enable-mysql**   | `false`                             | Enable/disable MySql deploy.                                                        |
+
+| Key                   | Required | Default                                            | Description                                                                           |
+|-----------------------|----------|----------------------------------------------------|---------------------------------------------------------------------------------------|
+| **php-image**         | **true** | `''`                                               | PHP image tag to use. Takes precedence over the `PHP_IMAGE_TAG` environment variable. |
+| **report-path**       | **true** | `./build/reports/phpunit-junit.xml`                | Report file path (where phpunit results will be saved).                               |
+| **enable-mysql**      | **true** | `false`                                            | Enable/disable MySql deploy.                                                          |
+| **enable-redis**      | **true** | `false`                                            | Enable/disable Redis deploy.                                                          |
+| **enable-workers**    | **true** | `false`                                            | Enable/disable workers in PHP container.                                              |
+| **workers-conf-path** | **true** | `ci/worker-confs/supervisor_dev_test_workers.conf` | File path for supervisor config.                                                      |
+| **with-coverage**     | **true** | `true`                                             | Run also code coverage when running unit tests.                                       |
+| **coverage-path**     | **true** | `./build/reports/coverage-clover.xml`              | Code coverage report file path.                                                       |
 
 ## Outputs
-None.
 
-ℹ If **MySql** is enabled the host in the PHP container will be set as `mysql.gha`.
+**N/A**
 
-ℹ Also, if **MySql** is enabled `migrations` will be run automatically.
+## Notes
 
-⚠ All your configs for this action should be set in `phpunit.xml` config file since no `.env` file is provisioned.
+ℹ This action doesn't handle docker registry authentication (e.g. for private images).
+You can run [docker/login-action@v1](https://github.com/docker/login-action) before this step.
 
-**List of default config values**
-- mysql host: `mysql.gha`
-- mysql database: `adoreme`
-- mysql user: `adoreme`
-- mysql password: `secret`
+ℹ Also, if **MySql** is enabled `migrations` and `seeds` will run automatically.
+
+⚠ Configuring the `.env` should be done through `.env.testing` file. 
+Laravel PHPUnit already sets the env to `testing` so it will be used automatically (we also set it on containers as env variables source: `--env-file .env.testing`). 
+
+Other tests related configurations should be done through `phpunit.xml` file. This way we avoid duplicating functionality, and you can run the same setup locally.
+
+🗒 **List of default config values**
+
+**MySql**
+- host: `mysql.gha`
+- database: `adoreme`
+- user: `adoreme`
+- password: `secret`
+
+**Redis**
+- host: `redis.gha`
 
 ### Example of step configuration and usage:
+
+For the most basic usage (fallback on all defaults) you can just add the following step to your workflow:
+
+```yaml
+steps:
+  - name: 'Run Composer Install'
+    uses: adore-me/phpunit-action@master
+```
+
+If you want to override some defaults you can do it like this:
+
 ```yaml
 steps:
   - name: 'Run Composer Install'
     uses: adore-me/phpunit-action@master
     with:
-      php-image-tag: SOME_IMAGE_TAG # Not needed if `env.PHP_IMAGE_TAG` is set.
-      gh-oauth-token: ${{ secrets.GH_PRIVATE_ACTIONS_TOKEN }} # Needed if you want to pull private dependencies.
+      php-image: SOME_IMAGE # Should be a fully qualified image tag (e.g. `quay.io/adore-me/nginx-fpm-alpine:php-7.4.3-c2-v1.1.1`)
+      report-path: ./build/reports/phpunit-junit.xml
+      enable-mysql: true
+      enable-redis: true
+      enable-workers: true
+      workers-conf-path: ci/worker-confs/supervisor_dev_test_workers.conf
+      with-coverage: true
+      coverage-path: ./build/reports/coverage-clover.xml
 ```
