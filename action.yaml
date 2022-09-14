@@ -38,11 +38,11 @@ runs:
     - name: 'Start MySql'
       id: start-mysql
       if: ${{ inputs.enable-mysql == 'true' }}
-      uses: adore-me/gha-mysql@v0.0.7
+      uses: adore-me/gha-mysql@v0.0.8
     - name: 'Start Redis'
       id: start-redis
       if: ${{ inputs.enable-redis == 'true' }}
-      uses: adore-me/gha-redis@v0.0.1
+      uses: adore-me/gha-redis@v0.0.2
     - name: 'Run PHPUnit'
       run: $GITHUB_ACTION_PATH/phpunit.sh
       shell: bash
