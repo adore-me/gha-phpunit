@@ -85,7 +85,7 @@ runs:
         junit_files: ${{ inputs.report-path }}
     - name: 'Publish Coverage'
       if: ${{ inputs.run-coverage == 'true' }}
-      uses: lucassabreu/comment-coverage-clover@main
+      uses: lucassabreu/comment-coverage-clover@v0.5.2
       with:
         file: ${{ inputs.coverage-path }}
         dir-prefix: '/var/www'
