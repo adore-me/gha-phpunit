@@ -6,16 +6,16 @@ Run phpunit with custom PHP image.
 
 ## Inputs
 
-| Key                   | Required | Default                                            | Description                                                                           |
-|-----------------------|----------|----------------------------------------------------|---------------------------------------------------------------------------------------|
-| **php-image**         | **true** | `''`                                               | PHP image tag to use. Takes precedence over the `PHP_IMAGE_TAG` environment variable. |
-| **report-path**       | **true** | `./build/reports/phpunit-junit.xml`                | Report file path (where phpunit results will be saved).                               |
-| **enable-mysql**      | **true** | `false`                                            | Enable/disable MySql deploy.                                                          |
-| **enable-redis**      | **true** | `false`                                            | Enable/disable Redis deploy.                                                          |
-| **enable-workers**    | **true** | `false`                                            | Enable/disable workers in PHP container.                                              |
-| **workers-conf-path** | **true** | `ci/worker-confs/supervisor_dev_test_workers.conf` | File path for supervisor config.                                                      |
-| **with-coverage**     | **true** | `true`                                             | Run also code coverage when running unit tests.                                       |
-| **coverage-path**     | **true** | `./build/reports/coverage-clover.xml`              | Code coverage report file path.                                                       |
+| Key                   | Required | Default                                            | Description                                             |
+|-----------------------|----------|----------------------------------------------------|---------------------------------------------------------|
+| **php-image**         | **true** | `''`                                               | PHP image tag to use.                                   |
+| **report-path**       | **true** | `./build/reports/phpunit-junit.xml`                | Report file path (where phpunit results will be saved). |
+| **enable-mysql**      | **true** | `false`                                            | Enable/disable MySql deploy.                            |
+| **enable-redis**      | **true** | `false`                                            | Enable/disable Redis deploy.                            |
+| **enable-workers**    | **true** | `false`                                            | Enable/disable workers in PHP container.                |
+| **workers-conf-path** | **true** | `ci/worker-confs/supervisor_dev_test_workers.conf` | File path for supervisor config.                        |
+| **with-coverage**     | **true** | `true`                                             | Run also code coverage when running unit tests.         |
+| **coverage-path**     | **true** | `./build/reports/coverage-clover.xml`              | Code coverage report file path.                         |
 
 ## Outputs
 
