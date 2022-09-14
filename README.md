@@ -50,7 +50,7 @@ For the most basic usage (fallback on all defaults) you can just add the followi
 
 ```yaml
 steps:
-  - name: 'Run Composer Install'
+  - name: 'Run PHPUnit'
     uses: adore-me/phpunit-action@master
 ```
 
@@ -58,7 +58,7 @@ If you want to override some defaults you can do it like this:
 
 ```yaml
 steps:
-  - name: 'Run Composer Install'
+  - name: 'Run PHPUnit Install'
     uses: adore-me/phpunit-action@master
     with:
       php-image: SOME_IMAGE # Should be a fully qualified image tag (e.g. `quay.io/adore-me/nginx-fpm-alpine:php-7.4.3-c2-v1.1.1`)
