@@ -69,8 +69,6 @@ fi
 docker exec nginx-fpm-alpine bash -c "$phpUnitCmd"
 UNIT_TEST_EXIT_CODE=$?
 
-docker stop nginx-fpm-alpine
-
 if [ "$UNIT_TEST_EXIT_CODE" != "0" ]; then
   echo "::error::PHPUnit failed with exit code: $UNIT_TEST_EXIT_CODE"
   exit $UNIT_TEST_EXIT_CODE
