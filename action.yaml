@@ -61,14 +61,20 @@ runs:
       if: ${{ inputs.enable-mysql == 'true' }}
       shell: bash
       run: |
-        docker stop mysql -t 0
-        docker rm mysql
+        docker stop mysql -t 0 || true
+        docker rm mysql || true
     - name: 'Stop Redis'
       if: ${{ inputs.enable-redis == 'true' }}
       shell: bash
       run: |
-        docker stop redis -t 0
-        docker rm redis
+        docker stop redis -t 0 || true
+        docker rm redis || true
+    - name: 'Stop Redis'
+      if: always()
+      shell: bash
+      run: |
+        docker stop nginx-fpm-alpine -t 0 || true
+        docker rm nginx-fpm-alpine || true
     - name: 'Publish PHPUnit Results'
       if: always()
       uses: EnricoMi/publish-unit-test-result-action@v2.0.0
