@@ -4,10 +4,14 @@ inputs:
   php-image:
     description: 'The PHP image to use'
     required: true
-  report-path:
-    description: 'PHPUnit report file path'
+  reports-dir:
+    description: 'Reports base directory'
     required: true
-    default: './build/reports/phpunit-junit.xml'
+    default: 'build/reports'
+  phpunit-report-file-name:
+    description: 'PHPUnit report file name'
+    required: true
+    default: 'phpunit-junit.xml'
   enable-mysql:
     description: 'Enable MySQL'
     required: true
@@ -28,10 +32,10 @@ inputs:
     description: 'Run coverage'
     required: true
     default: 'true'
-  coverage-path:
-    description: 'Coverage file path'
+  coverage-report-file-name:
+    description: 'Coverage report file name'
     required: true
-    default: './build/reports/clover-coverage.xml'
+    default: 'coverage-clover.xml'
 runs:
   using: 'composite'
   steps:
@@ -39,10 +43,12 @@ runs:
       id: start-mysql
       if: ${{ inputs.enable-mysql == 'true' }}
       uses: adore-me/gha-mysql@v0.0.8
+
     - name: 'Start Redis'
       id: start-redis
       if: ${{ inputs.enable-redis == 'true' }}
       uses: adore-me/gha-redis@v0.0.2
+
     - name: 'Run PHPUnit'
       run: $GITHUB_ACTION_PATH/phpunit.sh
       shell: bash
@@ -50,31 +56,35 @@ runs:
         INPUT_PHP_IMAGE: ${{ inputs.php-image }}
         MYSQL_CONTAINER_IP: ${{ steps.start-mysql.outputs.container-ip }}
         REDIS_CONTAINER_IP: ${{ steps.start-redis.outputs.container-ip }}
-        INPUT_REPORT_PATH: ${{ inputs.report-path }}
+        INPUT_PHPUNIT_REPORT_PATH: '${{ inputs.reports-dir }}/${{ inputs.phpunit-report-file-name }}'
         INPUT_ENABLE_MYSQL: ${{ inputs.enable-mysql }}
         INPUT_ENABLE_REDIS: ${{ inputs.enable-redis }}
         INPUT_ENABLE_WORKERS: ${{ inputs.enable-workers }}
         INPUT_WORKERS_CONF_PATH: ${{ inputs.workers-conf-path }}
         INPUT_WITH_COVERAGE: ${{ inputs.with-coverage }}
-        INPUT_COVERAGE_PATH: ${{ inputs.coverage-path }}
+        INPUT_COVERAGE_REPORT_PATH: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
+
     - name: 'Stop MySql'
       if: ${{ inputs.enable-mysql == 'true' }}
       shell: bash
       run: |
         docker stop mysql -t 0 || true
         docker rm mysql || true
+
     - name: 'Stop Redis'
       if: ${{ inputs.enable-redis == 'true' }}
       shell: bash
       run: |
         docker stop redis -t 0 || true
         docker rm redis || true
+
     - name: 'Stop Nginx'
       if: always()
       shell: bash
       run: |
         docker stop nginx-fpm-alpine -t 0 || true
         docker rm nginx-fpm-alpine || true
+
     - name: 'Publish PHPUnit Results'
       if: always()
       uses: EnricoMi/publish-unit-test-result-action@v2.0.0
@@ -83,9 +93,17 @@ runs:
         comment_title: 'PHPUnit Results'
         report_individual_runs: true
         junit_files: ${{ inputs.report-path }}
+
     - name: 'Publish Coverage'
       if: ${{ inputs.with-coverage == 'true' }}
       uses: lucassabreu/comment-coverage-clover@v0.5.2
       with:
-        file: ${{ inputs.coverage-path }}
+        file: ${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}
         dir-prefix: '/var/www'
+
+    - name: 'Save PHPUnit artifacts'
+      if: always()
+      uses: actions/upload-artifact@master
+      with:
+        name: phpunit-artifacts
+        path: ${{ inputs.reports-dir }}
