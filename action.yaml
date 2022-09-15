@@ -92,13 +92,13 @@ runs:
         check_name: 'PHPUnit'
         comment_title: 'PHPUnit Results'
         report_individual_runs: true
-        junit_files: ${{ inputs.report-path }}
+        junit_files: '${{ inputs.reports-dir }}/${{ inputs.phpunit-report-file-name }}'
 
     - name: 'Publish Coverage'
       if: ${{ inputs.with-coverage == 'true' }}
       uses: lucassabreu/comment-coverage-clover@v0.5.2
       with:
-        file: ${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}
+        file: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
         dir-prefix: '/var/www'
 
     - name: 'Save PHPUnit artifacts'
