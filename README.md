@@ -26,7 +26,7 @@ Run phpunit with custom PHP image.
 
 ℹ This action doesn't handle docker registry authentication (e.g. for private images).
 You can run [docker/login-action@v1](https://github.com/docker/login-action) before this step.  
-ℹ Also, if **MySql** is enabled `migrations` and `seeds` will run automatically.  
+ℹ If **MySql** is enabled `migrations` and `seeds` will run automatically.  
 ℹ It uses [publish-unit-test-result-action](https://github.com/EnricoMi/publish-unit-test-result-action) for publishing test results.  
 ℹ It uses [comment-coverage-clover](https://github.com/lucassabreu/comment-coverage-clover) for publishing code coverage.
 

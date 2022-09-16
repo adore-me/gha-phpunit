@@ -59,6 +59,11 @@ docker run \
 if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
   echo -e "${BL}Info:${NC} Bootstrap fresh DB"
   docker exec nginx-fpm-alpine bash -c "php artisan migrate:fresh -n --force && php artisan db:seed --force"
+  MIGRATIONS_EXIT_CODE=$?
+  if [ "$MIGRATIONS_EXIT_CODE" != "0" ]; then
+    echo "::error::Migrations failed with exit code: $MIGRATIONS_EXIT_CODE. Check logs for more info."
+    exit $MIGRATIONS_EXIT_CODE
+  fi
 fi
 
 if [ "$INPUT_ENABLE_WORKERS" == "true" ]; then
