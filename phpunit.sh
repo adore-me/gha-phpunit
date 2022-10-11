@@ -16,10 +16,17 @@ if [ -z "$INPUT_PHP_IMAGE" ]; then
   exit 1
 fi
 
-phpUnitCmd="./vendor/bin/phpunit --configuration=./phpunit.xml --log-junit=$INPUT_PHPUNIT_REPORT_PATH"
+if [ -z "$INPUT_RUN_SUITES" ]; then
+  echo "::error::No test suites provided"
+  exit 1
+fi
+
+
+
+phpUnitCmd="./vendor/bin/phpunit --configuration=./phpunit.xml --testsuite $INPUT_RUN_SUITES --log-junit=$INPUT_PHPUNIT_REPORT_PATH"
 if [ "$INPUT_WITH_COVERAGE" == "true" ]; then
   INPUT_PHP_IMAGE="${INPUT_PHP_IMAGE}-dev"
-  phpUnitCmd="php -d xdebug.mode=coverage ./vendor/bin/phpunit --configuration=./phpunit.xml --log-junit=$INPUT_PHPUNIT_REPORT_PATH --whitelist app/ --coverage-clover $INPUT_COVERAGE_REPORT_PATH"
+  phpUnitCmd="php -d xdebug.mode=coverage ./vendor/bin/phpunit --configuration=./phpunit.xml --testsuite $INPUT_RUN_SUITES --log-junit=$INPUT_PHPUNIT_REPORT_PATH --whitelist app/ --coverage-clover $INPUT_COVERAGE_REPORT_PATH"
 fi
 
 addHostMysql="--add-host=$mysqlHost:127.0.0.1"
