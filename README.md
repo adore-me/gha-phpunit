@@ -6,17 +6,18 @@ Run phpunit with custom PHP image.
 
 ## Inputs
 
-| Key                            | Required | Default                                            | Description                                                                                    |
-|--------------------------------|----------|----------------------------------------------------|------------------------------------------------------------------------------------------------|
-| **php-image**                  | **true** | `N/A`                                              | PHP image to use (fully qualified image address. ex: quay.io/adoreme/nginx-fpm-alpine:v0.0.1). |
-| **reports-dir**                | **true** | `build/reports`                                    | Report files directory (no trailing `/`).                                                      |
-| **phpunit-report-file-name**   | **true** | `phpunit-junit.xml`                                | PHPUnit report file name.                                                                      |
-| **enable-mysql**               | **true** | `false`                                            | Enable/disable MySql deploy.                                                                   |
-| **enable-redis**               | **true** | `false`                                            | Enable/disable Redis deploy.                                                                   |
-| **enable-workers**             | **true** | `false`                                            | Enable/disable workers in PHP container.                                                       |
-| **workers-conf-path**          | **true** | `ci/worker-confs/supervisor_dev_test_workers.conf` | File path for supervisor config.                                                               |
-| **with-coverage**              | **true** | `true`                                             | Run also code coverage when running unit tests.                                                |
-| **coverage-report-file-name**  | **true** | `coverage-clover.xml`                              | Code coverage report file name.                                                                |
+| Key                           | Required | Default                                            | Description                                                                                    |
+|-------------------------------|----------|----------------------------------------------------|------------------------------------------------------------------------------------------------|
+| **php-image**                 | **true** | `N/A`                                              | PHP image to use (fully qualified image address. ex: quay.io/adoreme/nginx-fpm-alpine:v0.0.1). |
+| **reports-dir**               | **true** | `build/reports`                                    | Report files directory (no trailing `/`).                                                      |
+| **phpunit-report-file-name**  | **true** | `phpunit-junit.xml`                                | PHPUnit report file name.                                                                      |
+| **enable-mysql**              | **true** | `false`                                            | Enable/disable MySql deploy.                                                                   |
+| **enable-redis**              | **true** | `false`                                            | Enable/disable Redis deploy.                                                                   |
+| **enable-workers**            | **true** | `false`                                            | Enable/disable workers in PHP container.                                                       |
+| **workers-conf-path**         | **true** | `ci/worker-confs/supervisor_dev_test_workers.conf` | File path for supervisor config.                                                               |
+| **with-coverage**             | **true** | `true`                                             | Run also code coverage when running unit tests.                                                |
+| **coverage-report-file-name** | **true** | `coverage-clover.xml`                              | Code coverage report file name.                                                                |
+| **run-suites**                | **true** | `UnitTests`                                        | Unit test suites to run.                                                                       |
 
 ## Outputs
 
