@@ -36,6 +36,10 @@ inputs:
     description: 'Coverage report file name'
     required: true
     default: 'coverage-clover.xml'
+  run-suites:
+    description: 'Run specific suites. Pass suites as a comma separated list, no spaces (e.g. "UnitTests,IntegrationTests")'
+    required: true
+    default: 'UnitTests'
 runs:
   using: 'composite'
   steps:
@@ -63,6 +67,7 @@ runs:
         INPUT_WORKERS_CONF_PATH: ${{ inputs.workers-conf-path }}
         INPUT_WITH_COVERAGE: ${{ inputs.with-coverage }}
         INPUT_COVERAGE_REPORT_PATH: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
+        INPUT_RUN_SUITES: ${{ inputs.run-suites }}
 
     - name: 'Stop MySql'
       if: ${{ inputs.enable-mysql == 'true' }}
