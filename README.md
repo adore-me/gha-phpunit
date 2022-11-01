@@ -1,30 +1,29 @@
 # gha-phpunit
 
 ## Description
-
-Run phpunit with custom PHP image.
+Run phpunit with custom PHP image.  
+ℹ The PHP image used can be passed through `php-image` input or through `PROJECT_IMAGE` env variable.  
+**NOTE:** If you use [gha-image-setup](https://github.com/adore-me/gha-image-setup) in a previous step you don't need to worry about it, as it already sets the `PROJECT_IMAGE` 👌    
+**Input** takes precedence!
 
 ## Inputs
-
-| Key                           | Required | Default                                            | Description                                                                                    |
-|-------------------------------|----------|----------------------------------------------------|------------------------------------------------------------------------------------------------|
-| **php-image**                 | **true** | `N/A`                                              | PHP image to use (fully qualified image address. ex: quay.io/adoreme/nginx-fpm-alpine:v0.0.1). |
-| **reports-dir**               | **true** | `build/reports`                                    | Report files directory (no trailing `/`).                                                      |
-| **phpunit-report-file-name**  | **true** | `phpunit-junit.xml`                                | PHPUnit report file name.                                                                      |
-| **enable-mysql**              | **true** | `false`                                            | Enable/disable MySql deploy.                                                                   |
-| **enable-redis**              | **true** | `false`                                            | Enable/disable Redis deploy.                                                                   |
-| **enable-workers**            | **true** | `false`                                            | Enable/disable workers in PHP container.                                                       |
-| **workers-conf-path**         | **true** | `ci/worker-confs/supervisor_dev_test_workers.conf` | File path for supervisor config.                                                               |
-| **with-coverage**             | **true** | `true`                                             | Run also code coverage when running unit tests.                                                |
-| **coverage-report-file-name** | **true** | `coverage-clover.xml`                              | Code coverage report file name.                                                                |
-| **run-suites**                | **true** | `UnitTests`                                        | Unit test suites to run.                                                                       |
+| Key                           | Required | Default                                            | Description                                                                                               |
+|-------------------------------|----------|----------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| **php-image**                 | **true** | `''`                                               | PHP image to use (fully qualified image address. ex: quay.io/adoreme/nginx-fpm-alpine:v0.0.1).            |
+| **reports-dir**               | **true** | `build/reports`                                    | Report files directory (no trailing `/`).                                                                 |
+| **phpunit-report-file-name**  | **true** | `phpunit-junit.xml`                                | PHPUnit report file name.                                                                                 |
+| **enable-mysql**              | **true** | `false`                                            | Enable/disable MySql deploy.                                                                              |
+| **enable-redis**              | **true** | `false`                                            | Enable/disable Redis deploy.                                                                              |
+| **enable-workers**            | **true** | `false`                                            | Enable/disable workers in PHP container.                                                                  |
+| **workers-conf-path**         | **true** | `ci/worker-confs/supervisor_dev_test_workers.conf` | File path for supervisor config.                                                                          |
+| **with-coverage**             | **true** | `true`                                             | Run also code coverage when running unit tests.                                                           |
+| **coverage-report-file-name** | **true** | `coverage-clover.xml`                              | Code coverage report file name.                                                                           |
+| **run-suites**                | **true** | `UnitTests`                                        | Run specific suites. Pass suites as a comma separated list, no spaces (e.g. "UnitTests,IntegrationTests") |
 
 ## Outputs
-
-**N/A**
+None.
 
 ## Notes
-
 ℹ This action doesn't handle docker registry authentication (e.g. for private images).
 You can run [docker/login-action@v1](https://github.com/docker/login-action) before this step.  
 ℹ If **MySql** is enabled `migrations` and `seeds` will run automatically.  
@@ -81,4 +80,5 @@ steps:
       workers-conf-path: ci/worker-confs/supervisor_dev_test_workers.conf
       with-coverage: true
       coverage-report-file-name: coverage-clover.xml
+      run-suites: 'IntegrationTests,UnitTests'
 ```
