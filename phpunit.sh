@@ -11,8 +11,19 @@ NC='\033[0m'
 mysqlHost="mysql.gha"
 redisHost="redis.gha"
 
-if [ -z "$INPUT_PHP_IMAGE" ]; then
-  echo "::error::No PHP image provided"
+ACTION_IMAGE=""
+if [ -n "$PROJECT_IMAGE" ]; then
+  echo -e "${BL}Info:${NC} Project image found in env var PROJECT_IMAGE: ${GR}$PROJECT_IMAGE${NC}"
+  ACTION_IMAGE="$PROJECT_IMAGE"
+fi
+
+if [ -n "$INPUT_PHP_IMAGE" ]; then
+  echo -e "${BL}Info:${NC} Project image found in input. Using ${GR}$PROJECT_IMAGE${NC}"
+  ACTION_IMAGE="$INPUT_PHP_IMAGE"
+fi
+
+if [ -z "$ACTION_IMAGE" ]; then
+  echo "::error::No image provided"
   exit 1
 fi
 
@@ -21,11 +32,9 @@ if [ -z "$INPUT_RUN_SUITES" ]; then
   exit 1
 fi
 
-
-
 phpUnitCmd="./vendor/bin/phpunit --configuration=./phpunit.xml --testsuite $INPUT_RUN_SUITES --log-junit=$INPUT_PHPUNIT_REPORT_PATH"
 if [ "$INPUT_WITH_COVERAGE" == "true" ]; then
-  INPUT_PHP_IMAGE="${INPUT_PHP_IMAGE}-dev"
+  ACTION_IMAGE="${ACTION_IMAGE}-dev"
   phpUnitCmd="php -d xdebug.mode=coverage ./vendor/bin/phpunit --configuration=./phpunit.xml --testsuite $INPUT_RUN_SUITES --log-junit=$INPUT_PHPUNIT_REPORT_PATH --whitelist app/ --coverage-clover $INPUT_COVERAGE_REPORT_PATH"
 fi
 
@@ -51,7 +60,7 @@ if [ "$INPUT_ENABLE_REDIS" == "true" ]; then
   echo -e "${BL}Info:${NC} Redis host provided: $REDIS_CONTAINER_IP"
 fi
 
-echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}$INPUT_PHP_IMAGE${NC} and hosts $GR\`$addHostMysql $addHostRedis\`${NC}"
+echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}$ACTION_IMAGE${NC} and hosts $GR\`$addHostMysql $addHostRedis\`${NC}"
 docker run \
   -d \
   --platform linux/amd64 \
@@ -61,7 +70,7 @@ docker run \
   "$addHostRedis" \
   --env-file ./.env.testing \
   -v "$PWD":/var/www \
-  "${INPUT_PHP_IMAGE}"
+  "${ACTION_IMAGE}"
 
 if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
   echo -e "${BL}Info:${NC} Bootstrap fresh DB"
