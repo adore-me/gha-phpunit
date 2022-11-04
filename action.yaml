@@ -54,6 +54,7 @@ runs:
       uses: adore-me/gha-redis@v0.0.2
 
     - name: 'Run PHPUnit'
+      id: phpunit
       run: $GITHUB_ACTION_PATH/phpunit.sh
       shell: bash
       env:
@@ -68,6 +69,26 @@ runs:
         INPUT_WITH_COVERAGE: ${{ inputs.with-coverage }}
         INPUT_COVERAGE_REPORT_PATH: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
         INPUT_RUN_SUITES: ${{ inputs.run-suites }}
+
+    - name: 'Notify commiter'
+      if: ${{ steps.phpunit.outputs.phpunit-error == 'true' }}
+      uses: actions/github-script@v6.3.3
+      with:
+        script: |
+          if (${{ steps.composer-install.outputs.composer-error }} == true) {
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `@${{ github.event.pull_request.user.login }}<br />⚠ PHPUnit has errors.<br /><details><summary>Details</summary>${{ steps.phpunit.outputs.composer-error-message }}</details>`
+            })
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['phpunit-env-error']
+            })
+          }
 
     - name: 'Stop MySql'
       if: ${{ inputs.enable-mysql == 'true' }}
@@ -91,7 +112,6 @@ runs:
         docker rm nginx-fpm-alpine || true
 
     - name: 'Publish PHPUnit Results'
-      if: always()
       uses: EnricoMi/publish-unit-test-result-action@v2.0.0
       with:
         check_name: 'PHPUnit'

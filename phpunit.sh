@@ -60,6 +60,17 @@ if [ "$INPUT_ENABLE_REDIS" == "true" ]; then
   echo -e "${BL}Info:${NC} Redis host provided: $REDIS_CONTAINER_IP"
 fi
 
+echo -e "${BL}Info:${NC} Checking for .env.testing file..."
+if [ ! -f ".env.testing" ]; then
+  errorMessage=".env.testing file not found! Please commit your .env.testing file to your repository."
+  echo "::error::$errorMessage"
+  echo "phpunit-error-message=$errorMessage" >> "$GITHUB_OUTPUT"
+  echo "phpunit-error=true" >> "$GITHUB_OUTPUT"
+  exit 1
+else
+  echo -e "${BL}Info:${NC} .env.testing file found! All good..."
+fi
+
 echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}$ACTION_IMAGE${NC} and hosts $GR\`$addHostMysql $addHostRedis\`${NC}"
 docker run \
   -d \
@@ -77,7 +88,10 @@ if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
   docker exec nginx-fpm-alpine bash -c "php artisan migrate:fresh -n --force && php artisan db:seed --force"
   MIGRATIONS_EXIT_CODE=$?
   if [ "$MIGRATIONS_EXIT_CODE" != "0" ]; then
-    echo "::error::Migrations failed with exit code: $MIGRATIONS_EXIT_CODE. Check logs for more info."
+    errorMessage="Migrations failed with exit code: $MIGRATIONS_EXIT_CODE. Check logs for more info."
+    echo "::error::$errorMessage"
+    echo "phpunit-error-message=$errorMessage" >> "$GITHUB_OUTPUT"
+    echo "phpunit-error=true" >> "$GITHUB_OUTPUT"
     exit $MIGRATIONS_EXIT_CODE
   fi
 fi
@@ -91,6 +105,11 @@ docker exec nginx-fpm-alpine bash -c "$phpUnitCmd"
 UNIT_TEST_EXIT_CODE=$?
 
 if [ "$UNIT_TEST_EXIT_CODE" != "0" ]; then
-  echo "::error::PHPUnit failed with exit code: $UNIT_TEST_EXIT_CODE"
+  errorMessage="PHPUnit failed with exit code: $UNIT_TEST_EXIT_CODE. Check logs for more info."
+  echo "::error::$errorMessage"
+  echo "phpunit-error-message=$errorMessage" >> "$GITHUB_OUTPUT"
+  echo "phpunit-error=true" >> "$GITHUB_OUTPUT"
   exit $UNIT_TEST_EXIT_CODE
 fi
+
+echo "phpunit-error=false" >> "$GITHUB_OUTPUT"
