@@ -39,7 +39,7 @@ if [ "$INPUT_WITH_COVERAGE" == "true" ]; then
 fi
 if [ "$INPUT_VERBOSE" == "true" ]; then
   echo -e "${BL}Info:${NC} Verbose mode enabled"
-  phpUnitCmd="$phpUnitCmd --verbose"
+  phpUnitCmd="$phpUnitCmd --verbose --debug"
 fi
 
 addHostMysql="--add-host=$mysqlHost:127.0.0.1"
