@@ -71,16 +71,16 @@ runs:
         INPUT_RUN_SUITES: ${{ inputs.run-suites }}
 
     - name: 'Notify commiter'
-      if: ${{ steps.phpunit.outputs.phpunit-error == 'true' }}
+      if: always()
       uses: actions/github-script@v6.3.3
       with:
         script: |
-          if (${{ steps.composer-install.outputs.composer-error }} == true) {
+          if (${{ steps.phpunit.outputs.phpunit-error }} == true) {
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `@${{ github.event.pull_request.user.login }}<br />⚠ PHPUnit has errors.<br /><details><summary>Details</summary>${{ steps.phpunit.outputs.composer-error-message }}</details>`
+              body: `@${{ github.event.pull_request.user.login }}<br />⚠ PHPUnit has errors.<br /><details><summary>Details</summary>${{ steps.phpunit.outputs.phpunit-error-message }}</details>`
             })
             github.rest.issues.addLabels({
               issue_number: context.issue.number,
@@ -89,6 +89,27 @@ runs:
               labels: ['phpunit-env-error']
             })
           }
+
+    - name: 'Publish PHPUnit Results'
+      uses: EnricoMi/publish-unit-test-result-action@v2.0.0
+      with:
+        check_name: 'PHPUnit'
+        comment_title: 'PHPUnit Results'
+        report_individual_runs: true
+        junit_files: '${{ inputs.reports-dir }}/${{ inputs.phpunit-report-file-name }}'
+
+    - name: 'Publish Coverage'
+      if: ${{ inputs.with-coverage == 'true' }}
+      uses: lucassabreu/comment-coverage-clover@v0.5.2
+      with:
+        file: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
+        dir-prefix: '/var/www'
+
+    - name: 'Save PHPUnit artifacts'
+      uses: actions/upload-artifact@master
+      with:
+        name: phpunit-artifacts
+        path: ${{ inputs.reports-dir }}
 
     - name: 'Stop MySql'
       if: ${{ inputs.enable-mysql == 'true' }}
@@ -110,25 +131,3 @@ runs:
       run: |
         docker stop nginx-fpm-alpine -t 0 || true
         docker rm nginx-fpm-alpine || true
-
-    - name: 'Publish PHPUnit Results'
-      uses: EnricoMi/publish-unit-test-result-action@v2.0.0
-      with:
-        check_name: 'PHPUnit'
-        comment_title: 'PHPUnit Results'
-        report_individual_runs: true
-        junit_files: '${{ inputs.reports-dir }}/${{ inputs.phpunit-report-file-name }}'
-
-    - name: 'Publish Coverage'
-      if: ${{ inputs.with-coverage == 'true' }}
-      uses: lucassabreu/comment-coverage-clover@v0.5.2
-      with:
-        file: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
-        dir-prefix: '/var/www'
-
-    - name: 'Save PHPUnit artifacts'
-      if: always()
-      uses: actions/upload-artifact@master
-      with:
-        name: phpunit-artifacts
-        path: ${{ inputs.reports-dir }}
