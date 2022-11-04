@@ -37,6 +37,10 @@ if [ "$INPUT_WITH_COVERAGE" == "true" ]; then
   ACTION_IMAGE="${ACTION_IMAGE}-dev"
   phpUnitCmd="php -d xdebug.mode=coverage ./vendor/bin/phpunit --configuration=./phpunit.xml --testsuite $INPUT_RUN_SUITES --log-junit=$INPUT_PHPUNIT_REPORT_PATH --whitelist app/ --coverage-clover $INPUT_COVERAGE_REPORT_PATH"
 fi
+if [ "$INPUT_VERBOSE" == "true" ]; then
+  echo -e "${BL}Info:${NC} Verbose mode enabled"
+  phpUnitCmd="$phpUnitCmd --verbose"
+fi
 
 addHostMysql="--add-host=$mysqlHost:127.0.0.1"
 if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
