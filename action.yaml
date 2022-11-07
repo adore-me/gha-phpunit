@@ -96,6 +96,7 @@ runs:
           }
 
     - name: 'Publish PHPUnit Results'
+      if: always()
       uses: EnricoMi/publish-unit-test-result-action@v2.0.0
       with:
         check_name: 'PHPUnit'
@@ -104,13 +105,14 @@ runs:
         junit_files: '${{ inputs.reports-dir }}/${{ inputs.phpunit-report-file-name }}'
 
     - name: 'Publish Coverage'
-      if: ${{ inputs.with-coverage == 'true' }}
+      if: always() && ${{ inputs.with-coverage == 'true' }}
       uses: lucassabreu/comment-coverage-clover@v0.5.2
       with:
         file: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
         dir-prefix: '/var/www'
 
     - name: 'Save PHPUnit artifacts'
+      if: always()
       uses: actions/upload-artifact@master
       with:
         name: phpunit-artifacts
