@@ -109,11 +109,10 @@ docker exec nginx-fpm-alpine bash -c "$phpUnitCmd"
 UNIT_TEST_EXIT_CODE=$?
 
 if [ "$UNIT_TEST_EXIT_CODE" != "0" ]; then
-  errorMessage="PHPUnit failed with exit code: $UNIT_TEST_EXIT_CODE. Check logs for more info."
-  echo "::error::$errorMessage"
-  echo "phpunit-error-message=$errorMessage" >> "$GITHUB_OUTPUT"
-  echo "phpunit-error=true" >> "$GITHUB_OUTPUT"
-  exit $UNIT_TEST_EXIT_CODE
+  echo "::error::PHPUnit failed with exit code: $UNIT_TEST_EXIT_CODE"
+else
+  echo -e "${GR}Success:${NC} PHPUnit finished successfully"
+  echo "phpunit-error=false" >> "$GITHUB_OUTPUT"
 fi
 
-echo "phpunit-error=false" >> "$GITHUB_OUTPUT"
+exit $UNIT_TEST_EXIT_CODE
