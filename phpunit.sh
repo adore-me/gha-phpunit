@@ -112,7 +112,8 @@ if [ "$UNIT_TEST_EXIT_CODE" != "0" ]; then
   echo "::error::PHPUnit failed with exit code: $UNIT_TEST_EXIT_CODE"
 else
   echo -e "${GR}Success:${NC} PHPUnit finished successfully"
-  echo "phpunit-error=false" >> "$GITHUB_OUTPUT"
 fi
 
+# Don't send error message. This kind of error is treated in reporting
+echo "phpunit-error=false" >> "$GITHUB_OUTPUT"
 exit $UNIT_TEST_EXIT_CODE
