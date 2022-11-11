@@ -4,7 +4,8 @@
 Run phpunit with custom PHP image.  
 ℹ The PHP image used can be passed through `php-image` input or through `PROJECT_IMAGE` env variable.  
 **NOTE:** If you use [gha-image-setup](https://github.com/adore-me/gha-image-setup) in a previous step you don't need to worry about it, as it already sets the `PROJECT_IMAGE` 👌    
-**Input** takes precedence!
+**Input** takes precedence!  
+It expects the project to have a `.env.testing.ci` file with the environment variables needed for the tests to run.
 
 ## Inputs
 | Key                           | Required | Default                                            | Description                                                                                               |
