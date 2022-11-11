@@ -64,16 +64,19 @@ if [ "$INPUT_ENABLE_REDIS" == "true" ]; then
   echo -e "${BL}Info:${NC} Redis host provided: $REDIS_CONTAINER_IP"
 fi
 
-echo -e "${BL}Info:${NC} Checking for .env.testing file..."
-if [ ! -f ".env.testing" ]; then
-  errorMessage=".env.testing file not found! Please commit your .env.testing file to your repository."
+echo -e "${BL}Info:${NC} Checking for .env.testing.ci file..."
+if [ ! -f ".env.testing.ci" ]; then
+  errorMessage=".env.testing.ci file not found! Please commit your .env.testing.ci file to your repository."
   echo "::error::$errorMessage"
   echo "phpunit-error-message=$errorMessage" >> "$GITHUB_OUTPUT"
   echo "phpunit-error=true" >> "$GITHUB_OUTPUT"
   exit 1
 else
-  echo -e "${BL}Info:${NC} .env.testing file found! All good..."
+  echo -e "${BL}Info:${NC} .env.testing.ci file found! All good..."
 fi
+
+echo -e "${BL}Info:${NC} Generating .env.testing file from .env.testing.ci..."
+cp .env.testing.ci .env.testing
 
 echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}$ACTION_IMAGE${NC} and hosts $GR\`$addHostMysql $addHostRedis\`${NC}"
 docker run \
