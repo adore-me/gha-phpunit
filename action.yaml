@@ -38,8 +38,8 @@ inputs:
     default: 'coverage-clover.xml'
   run-suites:
     description: 'Run specific suites. Pass suites as a comma separated list, no spaces (e.g. "UnitTests,IntegrationTests")'
-    required: true
-    default: 'UnitTests'
+    required: false
+    default: ''
   verbose:
     description: 'Run PHPUnit in verbose mode'
     required: true
