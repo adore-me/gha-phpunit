@@ -38,8 +38,8 @@ inputs:
     default: 'coverage-clover.xml'
   run-suites:
     description: 'Run specific suites. Pass suites as a comma separated list, no spaces (e.g. "UnitTests,IntegrationTests")'
-    required: false
-    default: ''
+    required: true
+    default: 'UnitTests'
   verbose:
     description: 'Run PHPUnit in verbose mode'
     required: true
@@ -97,7 +97,7 @@ runs:
 
     - name: 'Publish PHPUnit Results'
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action@v2.2.0
+      uses: EnricoMi/publish-unit-test-result-action@v2.0.0
       with:
         check_name: 'PHPUnit'
         comment_title: 'PHPUnit Results'
@@ -106,7 +106,7 @@ runs:
 
     - name: 'Publish Coverage'
       if: ${{ always() && inputs.with-coverage == 'true' }}
-      uses: lucassabreu/comment-coverage-clover@v0.5.2
+      uses: lucassabreu/comment-coverage-clover@v0.8.0
       with:
         file: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
         dir-prefix: '/var/www'
