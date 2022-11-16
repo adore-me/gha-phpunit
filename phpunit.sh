@@ -27,12 +27,13 @@ if [ -z "$ACTION_IMAGE" ]; then
   exit 1
 fi
 
-if [ -z "$INPUT_RUN_SUITES" ]; then
-  echo "::error::No test suites provided"
-  exit 1
+testSuiteFlag=""
+if [ -n "$INPUT_RUN_SUITES" ]; then
+  echo "${BL}Info:${NC}Testing suites found in input. Using ${GR}$INPUT_RUN_SUITES${NC}"
+  testSuiteFlag="--testsuite $INPUT_RUN_SUITES"
 fi
 
-phpUnitCmd="./vendor/bin/phpunit --configuration=./phpunit.xml --testsuite $INPUT_RUN_SUITES --log-junit=$INPUT_PHPUNIT_REPORT_PATH"
+phpUnitCmd="./vendor/bin/phpunit --configuration=./phpunit.xml $testSuiteFlag --log-junit=$INPUT_PHPUNIT_REPORT_PATH"
 if [ "$INPUT_WITH_COVERAGE" == "true" ]; then
   ACTION_IMAGE="${ACTION_IMAGE}-dev"
   phpUnitCmd="php -d xdebug.mode=coverage -d 'memory_limit=1G' $phpUnitCmd --whitelist app/ --coverage-clover $INPUT_COVERAGE_REPORT_PATH"

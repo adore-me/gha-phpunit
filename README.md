@@ -19,7 +19,7 @@ It expects the project to have a `.env.testing.ci` file with the environment var
 | **workers-conf-path**         | **true** | `ci/worker-confs/supervisor_dev_test_workers.conf` | File path for supervisor config.                                                                          |
 | **with-coverage**             | **true** | `true`                                             | Run also code coverage when running unit tests.                                                           |
 | **coverage-report-file-name** | **true** | `coverage-clover.xml`                              | Code coverage report file name.                                                                           |
-| **run-suites**                | **true** | `UnitTests`                                        | Run specific suites. Pass suites as a comma separated list, no spaces (e.g. "UnitTests,IntegrationTests") |
+| **run-suites**                | **true** | `''`                                               | Run specific suites. Pass suites as a comma separated list, no spaces (e.g. "UnitTests,IntegrationTests") |
 
 ## Outputs
 None.
