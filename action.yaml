@@ -97,7 +97,7 @@ runs:
 
     - name: 'Publish PHPUnit Results'
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action@v2.0.0
+      uses: EnricoMi/publish-unit-test-result-action@v2.2.0
       with:
         check_name: 'PHPUnit'
         comment_title: 'PHPUnit Results'
