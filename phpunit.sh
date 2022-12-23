@@ -109,6 +109,7 @@ if [ "$INPUT_ENABLE_WORKERS" == "true" ]; then
   docker exec nginx-fpm-alpine bash -c "ln -sf /var/www/$INPUT_WORKERS_CONF_PATH /etc/supervisor.d/conf.d/worker.conf && supervisorctl reread && supervisorctl update && supervisorctl restart all"
 fi
 
+echo -e "${BL}Info:${NC}Running phpunit: ${GR}$phpUnitCmd${NC}"
 docker exec nginx-fpm-alpine bash -c "$phpUnitCmd"
 UNIT_TEST_EXIT_CODE=$?
 
