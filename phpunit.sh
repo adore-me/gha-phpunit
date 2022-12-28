@@ -29,7 +29,7 @@ fi
 
 testSuiteFlag=""
 if [ -n "$INPUT_RUN_SUITES" ]; then
-  echo "${BL}Info:${NC}Testing suites found in input. Using ${GR}$INPUT_RUN_SUITES${NC}"
+  echo -e "${BL}Info:${NC}Testing suites found in input. Using ${GR}$INPUT_RUN_SUITES${NC}"
   testSuiteFlag="--testsuite $INPUT_RUN_SUITES"
 fi
 
