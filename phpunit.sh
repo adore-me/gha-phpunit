@@ -87,7 +87,6 @@ docker run \
   --network=bridge \
   "$addHostMysql" \
   "$addHostRedis" \
-  --env-file ./.env.testing \
   -v "$PWD":/var/www \
   "${ACTION_IMAGE}"
 
