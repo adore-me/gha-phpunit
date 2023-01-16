@@ -76,8 +76,8 @@ else
   echo -e "${BL}Info:${NC} .env.testing.ci file found! All good..."
 fi
 
-echo -e "${BL}Info:${NC} Generating .env.testing file from .env.testing.ci..."
-cp .env.testing.ci .env.testing
+echo -e "${BL}Info:${NC} Generating .env file from .env.testing.ci..."
+cp .env.testing.ci .env
 
 echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}$ACTION_IMAGE${NC} and hosts $GR\`$addHostMysql $addHostRedis\`${NC}"
 docker run \
