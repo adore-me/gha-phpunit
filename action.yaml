@@ -16,6 +16,14 @@ inputs:
     description: 'Enable MySQL'
     required: true
     default: 'false'
+  run-migrations:
+    description: 'Run migrations'
+    required: true
+    default: 'true'
+  run-seeds:
+    description: 'Run seeds'
+    required: true
+    default: 'true'
   enable-redis:
     description: 'Enable Redis'
     required: true
@@ -67,6 +75,8 @@ runs:
         REDIS_CONTAINER_IP: ${{ steps.start-redis.outputs.container-ip }}
         INPUT_PHPUNIT_REPORT_PATH: '${{ inputs.reports-dir }}/${{ inputs.phpunit-report-file-name }}'
         INPUT_ENABLE_MYSQL: ${{ inputs.enable-mysql }}
+        INPUT_RUN_MIGRATIONS: ${{ inputs.run-migrations }}
+        INPUT_RUN_SEEDS: ${{ inputs.run-seeds }}
         INPUT_ENABLE_REDIS: ${{ inputs.enable-redis }}
         INPUT_ENABLE_WORKERS: ${{ inputs.enable-workers }}
         INPUT_WORKERS_CONF_PATH: ${{ inputs.workers-conf-path }}
