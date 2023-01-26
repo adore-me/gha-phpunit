@@ -92,7 +92,10 @@ docker run \
 
 if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
   echo -e "${BL}Info:${NC} Bootstrap fresh DB"
-  docker exec nginx-fpm-alpine bash -c "php artisan migrate:fresh -n --force && php artisan db:seed --force"
+  if [ "$INPUT_RUN_MIGRATIONS" == "true" ]; then
+    echo -e "${BL}Info:${NC} Running migrations"
+    docker exec nginx-fpm-alpine bash -c "php artisan migrate:fresh -n --force"
+  fi
   MIGRATIONS_EXIT_CODE=$?
   if [ "$MIGRATIONS_EXIT_CODE" != "0" ]; then
     errorMessage="Migrations failed with exit code: $MIGRATIONS_EXIT_CODE. Check logs for more info."
@@ -100,6 +103,19 @@ if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
     echo "phpunit-error-message=$errorMessage" >> "$GITHUB_OUTPUT"
     echo "phpunit-error=true" >> "$GITHUB_OUTPUT"
     exit $MIGRATIONS_EXIT_CODE
+  fi
+
+  if [ "$INPUT_RUN_SEEDS" == "true" ]; then
+    echo -e "${BL}Info:${NC} Running seeds"
+    docker exec nginx-fpm-alpine bash -c "php artisan db:seed --force"
+  fi
+  SEEDS_EXIT_CODE=$?
+  if [ "$SEEDS_EXIT_CODE" != "0" ]; then
+    errorMessage="Seeds failed with exit code: $SEEDS_EXIT_CODE. Check logs for more info."
+    echo "::error::$errorMessage"
+    echo "phpunit-error-message=$errorMessage" >> "$GITHUB_OUTPUT"
+    echo "phpunit-error=true" >> "$GITHUB_OUTPUT"
+    exit $SEEDS_EXIT_CODE
   fi
 fi
 
