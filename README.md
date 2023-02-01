@@ -13,9 +13,9 @@ It expects the project to have a `.env.testing.ci` file with the environment var
 | **php-image**                 | **true** | `''`                                               | PHP image to use (fully qualified image address. ex: quay.io/adoreme/nginx-fpm-alpine:v0.0.1).            |
 | **reports-dir**               | **true** | `build/reports`                                    | Report files directory (no trailing `/`).                                                                 |
 | **phpunit-report-file-name**  | **true** | `phpunit-junit.xml`                                | PHPUnit report file name.                                                                                 |
-| **enable-mysql**              | **true** | `false`                                            | Run migrations. Disabled if `enable-mysql: false`.                                                        |
-| **run-migrations**            | **true** | `true`                                             | Run seeds. Disabled if `enable-mysql: false`.                                                             |
-| **run-seeds**                 | **true** | `true`                                             | Enable/disable MySql deploy.                                                                              |
+| **enable-mysql**              | **true** | `false`                                            | Enable/disable MySql deploy.                                                                              |
+| **run-migrations**            | **true** | `true`                                             | Run migrations. Disabled if `enable-mysql: false`.                                                        |
+| **run-seeds**                 | **true** | `true`                                             | Run seeds. Disabled if `enable-mysql: false`.                                                             |
 | **enable-redis**              | **true** | `false`                                            | Enable/disable Redis deploy.                                                                              |
 | **enable-workers**            | **true** | `false`                                            | Enable/disable workers in PHP container.                                                                  |
 | **workers-conf-path**         | **true** | `ci/worker-confs/supervisor_dev_test_workers.conf` | File path for supervisor config.                                                                          |
