@@ -36,11 +36,11 @@ fi
 phpUnitCmd="./vendor/bin/phpunit --configuration=./phpunit.xml $testSuiteFlag --log-junit=$INPUT_PHPUNIT_REPORT_PATH"
 if [ "$INPUT_WITH_COVERAGE" == "true" ]; then
   ACTION_IMAGE="${ACTION_IMAGE}-dev"
-  phpUnitCmd="php -d xdebug.mode=coverage -d 'memory_limit=1G' $phpUnitCmd --whitelist app/ --coverage-clover $INPUT_COVERAGE_REPORT_PATH"
+  phpUnitCmd="php -d xdebug.mode=coverage -d 'memory_limit=1G' $phpUnitCmd --coverage-clover $INPUT_COVERAGE_REPORT_PATH"
 fi
 if [ "$INPUT_VERBOSE" == "true" ]; then
   echo -e "${BL}Info:${NC} Verbose mode enabled"
-  phpUnitCmd="$phpUnitCmd --verbose"
+  phpUnitCmd="$phpUnitCmd --display-incomplete --display-skipped --display-deprecations --display-errors --display-notices --display-warning"
 fi
 
 addHostMysql="--add-host=$mysqlHost:127.0.0.1"
