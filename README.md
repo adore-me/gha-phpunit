@@ -1,5 +1,9 @@
 # gha-phpunit
 
+## Changelog
+
+:warning: Starting with `v.3.0.0` only `phpunit` v10 and above is supported!
+
 ## Description
 Run phpunit with custom PHP image.  
 ℹ The PHP image used can be passed through `php-image` input or through `PROJECT_IMAGE` env variable.  
