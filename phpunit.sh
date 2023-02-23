@@ -34,13 +34,23 @@ if [ -n "$INPUT_RUN_SUITES" ]; then
 fi
 
 phpUnitCmd="./vendor/bin/phpunit --configuration=./phpunit.xml $testSuiteFlag --log-junit=$INPUT_PHPUNIT_REPORT_PATH"
+isPhpUnit10="./vendor/bin/phpunit --version | grep \"10.\""
+canWhitelist="./vendor/bin/phpunit --help | grep whitelist"
 if [ "$INPUT_WITH_COVERAGE" == "true" ]; then
   ACTION_IMAGE="${ACTION_IMAGE}-dev"
+  if bash -c "$canWhitelist"; then
   phpUnitCmd="php -d xdebug.mode=coverage -d 'memory_limit=1G' $phpUnitCmd --whitelist app/ --coverage-clover $INPUT_COVERAGE_REPORT_PATH"
+  else
+  phpUnitCmd="php -d xdebug.mode=coverage -d 'memory_limit=1G' $phpUnitCmd --coverage-clover $INPUT_COVERAGE_REPORT_PATH"
+  fi
 fi
 if [ "$INPUT_VERBOSE" == "true" ]; then
   echo -e "${BL}Info:${NC} Verbose mode enabled"
-  phpUnitCmd="$phpUnitCmd --verbose"
+  if bash -c "$isPhpUnit10"; then
+    phpUnitCmd="$phpUnitCmd --display-incomplete --display-skipped --display-deprecations --display-errors --display-notices --display-warning"
+  else
+    phpUnitCmd="$phpUnitCmd --verbose"
+  fi
 fi
 
 addHostMysql="--add-host=$mysqlHost:127.0.0.1"
