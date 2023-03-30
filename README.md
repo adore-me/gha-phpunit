@@ -27,8 +27,8 @@ It expects the project to have a `.env.testing.ci` file with the environment var
 | **coverage-report-file-name** | **true** | `coverage-clover.xml`                              | Code coverage report file name.                                                                           |
 | **run-suites**                | **true** | `''`                                               | Run specific suites. Pass suites as a comma separated list, no spaces (e.g. "UnitTests,IntegrationTests") |
 | **verbose**                   | **true** | `false`                                            | Run PHPUnit in verbose mode                                                                               |
-| **min-line-coverage**         | **0**    | `0`                                            | Minimum percentage acceptable for line coverage                                                                       |
-| **min-method-coverage**       | **0**    | `0`                                            | Minimum percentage acceptable for method coverage                                                                     |
+| **min-line-coverage**         | **true** | `0`                                            | Minimum percentage acceptable for line coverage                                                                       |
+| **min-method-coverage**       | **true** | `0`                                            | Minimum percentage acceptable for method coverage                                                                     |
 
 ## Outputs
 None.
