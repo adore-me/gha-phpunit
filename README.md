@@ -23,6 +23,8 @@ It expects the project to have a `.env.testing.ci` file with the environment var
 | **coverage-report-file-name** | **true** | `coverage-clover.xml`                              | Code coverage report file name.                                                                           |
 | **run-suites**                | **true** | `''`                                               | Run specific suites. Pass suites as a comma separated list, no spaces (e.g. "UnitTests,IntegrationTests") |
 | **verbose**                   | **true** | `false`                                            | Run PHPUnit in verbose mode                                                                               |
+| **min-line-coverage**         | **true** | `0`                                            | Minimum percentage acceptable for line coverage                                                                       |
+| **min-method-coverage**       | **true** | `0`                                            | Minimum percentage acceptable for method coverage                                                                     |
 
 ## Outputs
 None.
@@ -85,4 +87,28 @@ steps:
       with-coverage: true
       coverage-report-file-name: coverage-clover.xml
       run-suites: 'IntegrationTests,UnitTests'
+```
+
+#### Using min-line-coverage and min-method-coverage
+
+In order to implement required code coverage, you can use this 2 options:
+
+
+```yaml
+steps:
+  - name: 'Run PHPUnit Install'
+    uses: adore-me/phpunit-action@master
+    with:
+      php-image: SOME_IMAGE # Should be a fully qualified image tag (e.g. `quay.io/adore-me/nginx-fpm-alpine:php-7.4.3-c2-v1.1.1`)
+      reports-dir: 'build/reports'
+      phpunit-report-file-name: phpunit-junit.xml
+      enable-mysql: true
+      enable-redis: true
+      enable-workers: true
+      workers-conf-path: ci/worker-confs/supervisor_dev_test_workers.conf
+      with-coverage: true
+      coverage-report-file-name: coverage-clover.xml
+      run-suites: 'IntegrationTests,UnitTests'
+      min-lin-coverage: 30
+      min-method-coverage: 30
 ```
