@@ -52,6 +52,12 @@ inputs:
     description: 'Run PHPUnit in verbose mode'
     required: true
     default: 'false'
+  min-line-coverage:
+    description: 'Minimum percentage acceptable for line coverage'
+    default: 0
+  min-method-coverage:
+    description: 'Minimum percentage acceptable for method coverage'
+    default: 0  
 runs:
   using: 'composite'
   steps:
@@ -120,7 +126,8 @@ runs:
       with:
         file: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
         dir-prefix: '/var/www'
-
+        min-line-coverage: '${{ inputs.min-line-coverage }}'
+        min-method-coverage: '${{ inputs.min-method-coverage }}'
     - name: 'Save PHPUnit artifacts'
       if: always()
       uses: actions/upload-artifact@master
