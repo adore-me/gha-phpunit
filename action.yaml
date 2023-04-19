@@ -64,12 +64,12 @@ runs:
     - name: 'Start MySql'
       id: start-mysql
       if: ${{ inputs.enable-mysql == 'true' }}
-      uses: adore-me/gha-mysql@v0.0.8
+      uses: adore-me/gha-mysql@v0.0.10
 
     - name: 'Start Redis'
       id: start-redis
       if: ${{ inputs.enable-redis == 'true' }}
-      uses: adore-me/gha-redis@v0.0.2
+      uses: adore-me/gha-redis@v0.0.4
 
     - name: 'Run PHPUnit'
       id: phpunit
