@@ -33,7 +33,17 @@ if [ -n "$INPUT_RUN_SUITES" ]; then
   testSuiteFlag="--testsuite $INPUT_RUN_SUITES"
 fi
 
-phpUnitCmd="./vendor/bin/phpunit --configuration=./phpunit.xml $testSuiteFlag --log-junit=$INPUT_PHPUNIT_REPORT_PATH"
+PHP_UNIT_BIN=""
+# Check if symfony.lock file exists
+if [ -f "symfony.lock" ]; then
+  echo -e "${BL}Info:${NC} Symfony framework detected. Setting PHP_UNIT_BIN to './bin/phpunit'${NC}"
+  PHP_UNIT_BIN="./bin/phpunit"
+else
+  echo -e "${BL}Info:${NC} Defaulting to Laravel framework. Setting PHP_UNIT_BIN to './vendor/bin/phpunit'${NC}"
+  PHP_UNIT_BIN="./vendor/bin/phpunit"
+fi
+
+phpUnitCmd="${PHP_UNIT_BIN} --configuration=./phpunit.xml $testSuiteFlag --log-junit=$INPUT_PHPUNIT_REPORT_PATH"
 if [ "$INPUT_WITH_COVERAGE" == "true" ]; then
   ACTION_IMAGE="${ACTION_IMAGE}-dev"
   phpUnitCmd="php -d xdebug.mode=coverage -d 'memory_limit=1G' $phpUnitCmd --coverage-clover $INPUT_COVERAGE_REPORT_PATH"
