@@ -103,8 +103,9 @@ if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
     echo -e "${BL}Info:${NC} Running migrations"
     if [ $IS_SYMFONY == true ]; then
       docker exec nginx-fpm-alpine bash -c "bin/console tools:database:refresh"
+    else
+      docker exec nginx-fpm-alpine bash -c "php artisan migrate:fresh -n --force"
     fi
-    docker exec nginx-fpm-alpine bash -c "php artisan migrate:fresh -n --force"
   fi
   MIGRATIONS_EXIT_CODE=$?
   if [ "$MIGRATIONS_EXIT_CODE" != "0" ]; then
