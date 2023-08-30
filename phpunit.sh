@@ -90,10 +90,20 @@ docker run \
   -v "$PWD":/var/www \
   "${ACTION_IMAGE}"
 
+# Check if symfony.lock file exists
+IS_SYMFONY=false
+if [ -f "symfony.lock" ]; then
+  echo -e "${BL}Info:${NC} Symfony framework detected. Setting IS_SYMFONY to 'true'${NC}"
+  IS_SYMFONY=true
+fi
+
 if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
   echo -e "${BL}Info:${NC} Bootstrap fresh DB"
   if [ "$INPUT_RUN_MIGRATIONS" == "true" ]; then
     echo -e "${BL}Info:${NC} Running migrations"
+    if [ $IS_SYMFONY == true ]; then
+      docker exec nginx-fpm-alpine bash -c "bin/console tools:database:refresh"
+    fi
     docker exec nginx-fpm-alpine bash -c "php artisan migrate:fresh -n --force"
   fi
   MIGRATIONS_EXIT_CODE=$?
