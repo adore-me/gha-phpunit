@@ -117,7 +117,11 @@ if [ "$INPUT_ENABLE_MYSQL" == "true" ]; then
 
   if [ "$INPUT_RUN_SEEDS" == "true" ]; then
     echo -e "${BL}Info:${NC} Running seeds"
-    docker exec nginx-fpm-alpine bash -c "php artisan db:seed --force"
+    if [ "$IS_SYMFONY" == "true" ]; then
+      docker exec nginx-fpm-alpine bash -c "bin/console tools:database:seed"
+    else
+      docker exec nginx-fpm-alpine bash -c "php artisan db:seed --force"
+    fi
   fi
   SEEDS_EXIT_CODE=$?
   if [ "$SEEDS_EXIT_CODE" != "0" ]; then
