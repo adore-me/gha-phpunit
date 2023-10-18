@@ -11,23 +11,24 @@ Run phpunit with custom PHP image.
 It expects the project to have a `.env.testing.ci` file with the environment variables needed for the tests to run.
 
 ## Inputs
-| Key                           | Required | Default                                            | Description                                                                                                |
-|-------------------------------|----------|----------------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| **php-image**                 | **true** | `''`                                               | PHP image to use (fully qualified image address. ex: quay.io/adoreme/nginx-fpm-alpine:v0.0.1).             |
-| **reports-dir**               | **true** | `build/reports`                                    | Report files directory (no trailing `/`).                                                                  |
-| **phpunit-report-file-name**  | **true** | `phpunit-junit.xml`                                | PHPUnit report file name.                                                                                  |
-| **enable-mysql**              | **true** | `false`                                            | Enable/disable MySql deploy.                                                                               |
-| **run-migrations**            | **true** | `true`                                             | Run migrations. Disabled if `enable-mysql: false`.                                                         |
-| **run-seeds**                 | **true** | `true`                                             | Run seeds. Disabled if `enable-mysql: false`.                                                              |
-| **enable-redis**              | **true** | `false`                                            | Enable/disable Redis deploy.                                                                               |
-| **enable-workers**            | **true** | `false`                                            | Enable/disable workers in PHP container.                                                                   |
-| **workers-conf-path**         | **true** | `ci/worker-confs/supervisor_dev_test_workers.conf` | File path for supervisor config.                                                                           |
-| **with-coverage**             | **true** | `true`                                             | Run also code coverage when running unit tests.                                                            |
-| **coverage-report-file-name** | **true** | `coverage-clover.xml`                              | Code coverage report file name.                                                                            |
-| **run-suites**                | **true** | `''`                                               | Run specific suites. Pass suites as a comma separated list, no spaces (e.g. "UnitTests,IntegrationTests")  |
-| **verbose**                   | **true** | `false`                                            | Run PHPUnit in verbose mode                                                                                |
-| **min-line-coverage**         | **true** | `0`                                                | Minimum percentage acceptable for line coverage                                                            |
-| **min-method-coverage**       | **true** | `0`                                                | Minimum percentage acceptable for method coverage                                                          |
+| Key                           | Required  | Default                                            | Description                                                                                               |
+|-------------------------------|-----------|----------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| **php-image**                 | **true**  | `''`                                               | PHP image to use (fully qualified image address. ex: quay.io/adoreme/nginx-fpm-alpine:v0.0.1).            |
+| **reports-dir**               | **true**  | `build/reports`                                    | Report files directory (no trailing `/`).                                                                 |
+| **phpunit-report-file-name**  | **true**  | `phpunit-junit.xml`                                | PHPUnit report file name.                                                                                 |
+| **enable-mysql**              | **true**  | `false`                                            | Enable/disable MySql deploy.                                                                              |
+| **run-migrations**            | **true**  | `true`                                             | Run migrations. Disabled if `enable-mysql: false`.                                                        |
+| **run-seeds**                 | **true**  | `true`                                             | Run seeds. Disabled if `enable-mysql: false`.                                                             |
+| **enable-redis**              | **true**  | `false`                                            | Enable/disable Redis deploy.                                                                              |
+| **enable-workers**            | **true**  | `false`                                            | Enable/disable workers in PHP container.                                                                  |
+| **workers-conf-path**         | **true**  | `ci/worker-confs/supervisor_dev_test_workers.conf` | File path for supervisor config.                                                                          |
+| **with-coverage**             | **true**  | `true`                                             | Run also code coverage when running unit tests.                                                           |
+| **coverage-report-file-name** | **true**  | `coverage-clover.xml`                              | Code coverage report file name.                                                                           |
+| **run-suites**                | **true**  | `''`                                               | Run specific suites. Pass suites as a comma separated list, no spaces (e.g. "UnitTests,IntegrationTests") |
+| **verbose**                   | **true**  | `false`                                            | Run PHPUnit in verbose mode                                                                               |
+| **min-line-coverage**         | **true**  | `0`                                                | Minimum percentage acceptable for line coverage                                                           |
+| **min-method-coverage**       | **true**  | `0`                                                | Minimum percentage acceptable for method coverage                                                         |
+| **enable-rabbitmq**           | **false** | `false`                                            | Enable rabbitMq deploy.                                                                                   |
 
 ## Outputs
 None.
