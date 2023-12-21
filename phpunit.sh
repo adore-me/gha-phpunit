@@ -10,6 +10,7 @@ NC='\033[0m'
 # Constants
 mysqlHost="mysql.gha"
 redisHost="redis.gha"
+rabbitMQHost="rabbitmq.gha"
 
 ACTION_IMAGE=""
 if [ -n "$PROJECT_IMAGE" ]; then
@@ -65,6 +66,17 @@ if [ "$INPUT_ENABLE_REDIS" == "true" ]; then
   echo -e "${BL}Info:${NC} Redis host provided: $REDIS_CONTAINER_IP"
 fi
 
+addHostRabbitMQ="--add-host=$rabbitMQHost:127.0.0.1"
+if [ "$INPUT_ENABLE_RABBITMQ" == "true" ]; then
+  if [ -z "$RABBITMQ_CONTAINER_IP" ]; then
+    echo "::error:: No $RABBITMQ_CONTAINER_IP provided, but RabbitMQ is enabled. Please checks logs above for errors."
+    exit 1
+  fi
+
+  addHostRabbitMQ="--add-host=$rabbitMQHost:$RABBITMQ_CONTAINER_IP"
+  echo -e "${BL}Info:${NC} RabbitMQ host provided: $RABBITMQ_CONTAINER_IP"
+fi
+
 echo -e "${BL}Info:${NC} Checking for .env.testing.ci file..."
 if [ ! -f ".env.testing.ci" ]; then
   errorMessage=".env.testing.ci file not found! Please commit your .env.testing.ci file to your repository."
@@ -79,7 +91,7 @@ fi
 echo -e "${BL}Info:${NC} Generating .env file from .env.testing.ci..."
 cp .env.testing.ci .env
 
-echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}$ACTION_IMAGE${NC} and hosts $GR\`$addHostMysql $addHostRedis\`${NC}"
+echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}$ACTION_IMAGE${NC} and hosts $GR\`$addHostMysql $addHostRedis $addHostRabbitMQ\`${NC}"
 docker run \
   -d \
   --platform linux/amd64 \
@@ -87,9 +99,11 @@ docker run \
   --network=bridge \
   "$addHostMysql" \
   "$addHostRedis" \
+  "$addHostRabbitMQ" \
   -v "$PWD":/var/www \
   "${ACTION_IMAGE}"
 
+# Check if symfony.lock file exists
 IS_SYMFONY=false
 if [ -f "symfony.lock" ]; then
   echo -e "${BL}Info:${NC} Symfony framework detected. Setting IS_SYMFONY to 'true'${NC}"

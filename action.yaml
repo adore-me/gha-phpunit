@@ -57,7 +57,11 @@ inputs:
     default: 0
   min-method-coverage:
     description: 'Minimum percentage acceptable for method coverage'
-    default: 0      
+    default: 0
+  enable-rabbitmq:
+    description: 'Enable RabbitMQ'
+    required: false
+    default: 'false'
 runs:
   using: 'composite'
   steps:
@@ -70,6 +74,11 @@ runs:
       id: start-redis
       if: ${{ inputs.enable-redis == 'true' }}
       uses: adore-me/gha-redis@v0.0.4
+
+    - name: 'Start RabbitMQ'
+      id: start-rabbitmq
+      if: ${{ inputs.enable-rabbitmq == 'true' }}
+      uses: adore-me/gha-rabbitmq@v0.0.3
 
     - name: 'Run PHPUnit'
       id: phpunit
@@ -90,6 +99,8 @@ runs:
         INPUT_COVERAGE_REPORT_PATH: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
         INPUT_RUN_SUITES: ${{ inputs.run-suites }}
         INPUT_VERBOSE: ${{ inputs.verbose }}
+        RABBITMQ_CONTAINER_IP: ${{ steps.start-rabbitmq.outputs.container-ip }}
+        INPUT_ENABLE_RABBITMQ: ${{ inputs.enable-rabbitmq }}
 
     - name: 'Notify commiter'
       if: always()
