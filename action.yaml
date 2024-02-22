@@ -102,25 +102,25 @@ runs:
         RABBITMQ_CONTAINER_IP: ${{ steps.start-rabbitmq.outputs.container-ip }}
         INPUT_ENABLE_RABBITMQ: ${{ inputs.enable-rabbitmq }}
 
-    - name: 'Notify commiter'
-      if: always()
-      uses: actions/github-script@v6.4.1
-      with:
-        script: |
-          if (${{ steps.phpunit.outputs.phpunit-error }} == true) {
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `@${{ github.event.pull_request.user.login }}<br />⚠ PHPUnit has errors.<br /><details><summary>Details</summary>${{ steps.phpunit.outputs.phpunit-error-message }}</details>`
-            })
-            github.rest.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['phpunit-env-error']
-            })
-          }
+#    - name: 'Notify commiter'
+#      if: always()
+#      uses: actions/github-script@v6.4.1
+#      with:
+#        script: |
+#          if (${{ steps.phpunit.outputs.phpunit-error }} == true) {
+#            github.rest.issues.createComment({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              body: `@${{ github.event.pull_request.user.login }}<br />⚠ PHPUnit has errors.<br /><details><summary>Details</summary>${{ steps.phpunit.outputs.phpunit-error-message }}</details>`
+#            })
+#            github.rest.issues.addLabels({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              labels: ['phpunit-env-error']
+#            })
+#          }
 
     - name: 'Publish PHPUnit Results'
       if: always()
