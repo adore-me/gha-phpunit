@@ -62,6 +62,10 @@ inputs:
     description: 'Enable RabbitMQ'
     required: false
     default: 'false'
+  testing-file:
+    description: '.env.testing file is used'
+    required: false
+    default: 'true'
 runs:
   using: 'composite'
   steps:
@@ -101,50 +105,51 @@ runs:
         INPUT_VERBOSE: ${{ inputs.verbose }}
         RABBITMQ_CONTAINER_IP: ${{ steps.start-rabbitmq.outputs.container-ip }}
         INPUT_ENABLE_RABBITMQ: ${{ inputs.enable-rabbitmq }}
+        INPUT_TESTING_FILE: ${{ inputs.testing-file }}
 
-#    - name: 'Notify commiter'
-#      if: always()
-#      uses: actions/github-script@v6.4.1
-#      with:
-#        script: |
-#          if (${{ steps.phpunit.outputs.phpunit-error }} == true) {
-#            github.rest.issues.createComment({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              body: `@${{ github.event.pull_request.user.login }}<br />⚠ PHPUnit has errors.<br /><details><summary>Details</summary>${{ steps.phpunit.outputs.phpunit-error-message }}</details>`
-#            })
-#            github.rest.issues.addLabels({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              labels: ['phpunit-env-error']
-#            })
-#          }
+    - name: 'Notify commiter'
+      if: always()
+      uses: actions/github-script@v6.4.1
+      with:
+        script: |
+          if (${{ steps.phpunit.outputs.phpunit-error }} == true) {
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `@${{ github.event.pull_request.user.login }}<br />⚠ PHPUnit has errors.<br /><details><summary>Details</summary>${{ steps.phpunit.outputs.phpunit-error-message }}</details>`
+            })
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['phpunit-env-error']
+            })
+          }
 
-#    - name: 'Publish PHPUnit Results'
-#      if: always()
-#      uses: EnricoMi/publish-unit-test-result-action@v2.6.2
-#      with:
-#        check_name: 'PHPUnit'
-#        comment_title: 'PHPUnit Results'
-#        report_individual_runs: true
-#        junit_files: '${{ inputs.reports-dir }}/${{ inputs.phpunit-report-file-name }}'
+    - name: 'Publish PHPUnit Results'
+      if: always()
+      uses: EnricoMi/publish-unit-test-result-action@v2.6.2
+      with:
+        check_name: 'PHPUnit'
+        comment_title: 'PHPUnit Results'
+        report_individual_runs: true
+        junit_files: '${{ inputs.reports-dir }}/${{ inputs.phpunit-report-file-name }}'
 
-#    - name: 'Publish Coverage'
-#      if: ${{ always() && inputs.with-coverage == 'true' }}
-#      uses: lucassabreu/comment-coverage-clover@v0.9.2
-#      with:
-#        file: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
-#        dir-prefix: '/var/www'
-#        min-line-coverage: '${{ inputs.min-line-coverage }}'
-#        min-method-coverage: '${{ inputs.min-method-coverage }}'
-#    - name: 'Save PHPUnit artifacts'
-#      if: always()
-#      uses: actions/upload-artifact@v3.1.2
-#      with:
-#        name: phpunit-artifacts
-#        path: ${{ inputs.reports-dir }}
+    - name: 'Publish Coverage'
+      if: ${{ always() && inputs.with-coverage == 'true' }}
+      uses: lucassabreu/comment-coverage-clover@v0.9.2
+      with:
+        file: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
+        dir-prefix: '/var/www'
+        min-line-coverage: '${{ inputs.min-line-coverage }}'
+        min-method-coverage: '${{ inputs.min-method-coverage }}'
+    - name: 'Save PHPUnit artifacts'
+      if: always()
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: phpunit-artifacts
+        path: ${{ inputs.reports-dir }}
 
     - name: 'Stop MySql'
       if: ${{ inputs.enable-mysql == 'true' }}
