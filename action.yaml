@@ -62,7 +62,7 @@ inputs:
     description: 'Enable RabbitMQ'
     required: false
     default: 'false'
-  testing-file:
+  testing-env-file:
     description: '.env.testing file is used'
     required: false
     default: 'true'
@@ -105,7 +105,7 @@ runs:
         INPUT_VERBOSE: ${{ inputs.verbose }}
         RABBITMQ_CONTAINER_IP: ${{ steps.start-rabbitmq.outputs.container-ip }}
         INPUT_ENABLE_RABBITMQ: ${{ inputs.enable-rabbitmq }}
-        INPUT_TESTING_FILE: ${{ inputs.testing-file }}
+        INPUT_TESTING_FILE: ${{ inputs.testing-env-file }}
 
     - name: 'Notify commiter'
       if: always()
