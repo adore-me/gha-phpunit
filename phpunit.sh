@@ -77,19 +77,22 @@ if [ "$INPUT_ENABLE_RABBITMQ" == "true" ]; then
   echo -e "${BL}Info:${NC} RabbitMQ host provided: $RABBITMQ_CONTAINER_IP"
 fi
 
-echo -e "${BL}Info:${NC} Checking for .env.testing.ci file..."
-if [ ! -f ".env.testing.ci" ]; then
-  errorMessage=".env.testing.ci file not found! Please commit your .env.testing.ci file to your repository."
-  echo "::error::$errorMessage"
-  echo "phpunit-error-message=$errorMessage" >> "$GITHUB_OUTPUT"
-  echo "phpunit-error=true" >> "$GITHUB_OUTPUT"
-  exit 1
+if [ "$INPUT_TESTING_FILE" == "true" ]; then
+  echo -e "${BL}Info:${NC} Checking for .env.testing.ci file..."
+  if [ ! -f ".env.testing.ci" ]; then
+    errorMessage=".env.testing.ci file not found! Please commit your .env.testing.ci file to your repository."
+    echo "::error::$errorMessage"
+    echo "phpunit-error-message=$errorMessage" >> "$GITHUB_OUTPUT"
+    echo "phpunit-error=true" >> "$GITHUB_OUTPUT"
+    exit 1
+  else
+    echo -e "${BL}Info:${NC} .env.testing.ci file found! All good..."
+    echo -e "${BL}Info:${NC} Generating .env file from .env.testing.ci..."
+    cp .env.testing.ci .env
+  fi
 else
-  echo -e "${BL}Info:${NC} .env.testing.ci file found! All good..."
+  echo -e "${BL}Info:${NC} Checking for .env.testing.ci file is skipped"
 fi
-
-echo -e "${BL}Info:${NC} Generating .env file from .env.testing.ci..."
-cp .env.testing.ci .env
 
 echo -e "${BL}Info:${NC} Running PHPUnit with image: ${GR}$ACTION_IMAGE${NC} and hosts $GR\`$addHostMysql $addHostRedis $addHostRabbitMQ\`${NC}"
 docker run \
