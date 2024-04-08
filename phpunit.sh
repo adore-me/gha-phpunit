@@ -35,7 +35,10 @@ if [ -n "$INPUT_RUN_SUITES" ]; then
 fi
 
 phpUnitCmd="./vendor/bin/phpunit --configuration=./phpunit.xml $testSuiteFlag --log-junit=$INPUT_PHPUNIT_REPORT_PATH"
-if [ "$INPUT_WITH_COVERAGE" == "true" ]; then
+if [ "$INPUT_WITH_COVERAGE" == "pcov" ]; then
+  ACTION_IMAGE="${ACTION_IMAGE}-coverage"
+  phpUnitCmd="php -d pcov.enabled=1 -d 'memory_limit=1G' $phpUnitCmd --coverage-clover $INPUT_COVERAGE_REPORT_PATH"
+elif [ "$INPUT_WITH_COVERAGE" == "true" ]; then
   ACTION_IMAGE="${ACTION_IMAGE}-dev"
   phpUnitCmd="php -d xdebug.mode=coverage -d 'memory_limit=1G' $phpUnitCmd --coverage-clover $INPUT_COVERAGE_REPORT_PATH"
 fi
