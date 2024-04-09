@@ -40,7 +40,10 @@ You can run [docker/login-action@v1](https://github.com/docker/login-action) bef
 Automatically handles uploading artifacts to GitHub Actions.
 
 ## Notes on using coverage
-⚠ If `with-coverage` is enabled, it will automatically append the `-dev` suffix to the PHP image tag (internally, this image has xdebug, needed for coverage report).  
+⚠ If `with-coverage` is set to `pcov`, it will automatically append the `-coverage` suffix to the PHP image tag (internally, this image extends the production image, and just adds `pcov` extension).  
+NOTE: Make sure there is a `-coverage` image for the PHP image you are using.
+
+⚠ If `with-coverage` is set to `true`, it will automatically append the `-dev` suffix to the PHP image tag (internally, this image has xdebug, needed for coverage report).  
 Otherwise, it will use the image tag as is (without xdebug), for faster running time.
 
 ## Notes on configuring `.env`
@@ -84,7 +87,7 @@ steps:
       enable-redis: true
       enable-workers: true
       workers-conf-path: ci/worker-confs/supervisor_dev_test_workers.conf
-      with-coverage: true
+      with-coverage: 'pcov'
       coverage-report-file-name: coverage-clover.xml
       run-suites: 'IntegrationTests,UnitTests'
 ```
@@ -104,7 +107,7 @@ steps:
       enable-redis: true
       enable-workers: true
       workers-conf-path: ci/worker-confs/supervisor_dev_test_workers.conf
-      with-coverage: true
+      with-coverage: 'pcov'
       coverage-report-file-name: coverage-clover.xml
       run-suites: 'IntegrationTests,UnitTests'
       min-lin-coverage: 30
