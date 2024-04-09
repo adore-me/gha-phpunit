@@ -132,7 +132,7 @@ runs:
         junit_files: '${{ inputs.reports-dir }}/${{ inputs.phpunit-report-file-name }}'
 
     - name: 'Publish Coverage'
-      if: ${{ always() && inputs.with-coverage == 'true' }}
+      if: ${{ always() && inputs.with-coverage != 'false' }}
       uses: lucassabreu/comment-coverage-clover@v0.12.0
       with:
         file: '${{ inputs.reports-dir }}/${{ inputs.coverage-report-file-name }}'
